@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tech Blog!</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+</head>
+
+<body>
+  <div class="flex-column justify-space-around">
+    <header class="display-flex justify-space-between align-center p-2">
+      <h1>
+        <span role="img" aria-label="blog">👩‍💻</span>
+        <a href="/">My Tech Blog</a>
+      </h1>
+      <nav>
+        <!-- Conditionally render login or logout links -->
+        {{#if logged_in}}
+          <a href="/" class="navbar-item is-hoverable pt-1">homepage</a>
+          <a href="/profile" class="navbar-item is-hoverable pt-1">profile</a>
+          <a href="/profile/create/" class="navbar-item is-hoverable pt-1 mr-4">create post</a>
+          <button id="logout" class="button is-danger">logout</button>
+        {{else}}
+          <a href="/" class="navbar-item is-hoverable pt-1">homepage</a>
+          <a href="/login" class="button is-primary">login</a>
+        {{/if}}
+      </nav>
+    </header>
+    <main class="container container-fluid mt-5">
+      <!-- Render the sub layout -->
+      {{{ body }}}
+    </main>
+    <footer>
+      <div class="row-is-full content has-text-centered">
+            <p>
+            <a href="/">homepage</a>{{#if loggedIn}} | 
+            <a href="/profile/">profile</a> | 
+            <a href="/profile/create/">create new post</a>
+            {{else}}
+             | <a href="/login/">login</a>
+            {{/if}}
+            </p>
+        </div>
+      <div class="row-is-full content has-text-centered">
+    <p>
+      <strong>My Tech Blog</strong> by <a href="https://github.com/afzama">Maria Afzal</a> | made with <a href="https://bulma.io/">bulma</a> | source code:
+      <a href=""><i class="fab fa-github"></i></a> |  
+       <a href="mailto:maria.binte.afzal@gmail.com"><i class="far fa-envelope"></i></a>
+    </p>
+  </div>
+    </footer>
+  </div>
+
+  <!-- Render script for logged in users only -->
+  {{#if logged_in}}
+  <script src="/js/logout.js"></script>
+  {{/if}}
+</body>
+
+</html>
