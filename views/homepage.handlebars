@@ -1,0 +1,33 @@
+{{#each posts as |post|}}
+
+{{> post-info post }}
+</div>
+
+{{else}}
+<h6 class="pb-4 has-text-centered is-italic">there are currently no posts</h6>
+{{/each}}
+
+{{#if session.logged_in}}
+<div class="call-to-action">
+  <h5>Add blogposts to your profile</h5>
+  <button class="btn cta-button">
+    <a href="/profile">Profile</a>
+  </button>
+</div>
+
+{{else}}
+<div class="call-to-action">
+  <h3>Want to create your own blogpost, or view/add comments?</h3>
+  <h3>Sign up or login below!</h3>
+  <span for="img" aria-label="blog">👩🏻‍💻</span>
+  <div class="login-buttons">
+    <button class="btn cta-button">
+      <a href="/login">Login</a>
+    </button>
+    <button class="btn cta-button">
+      <a href="/signup">Signup</a>
+    </button>
+  </div>
+</div>
+{{/if}}
+{{/each}}
