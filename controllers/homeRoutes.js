@@ -4,7 +4,7 @@ const withAuth = require('../utils/auth');
 
 
 // Get route for homepage - getting all blogposts in the database
-router.get('/', async (req, res) => {
+router.get('/', withAuth async (req, res) => {
   try {
 
     const blogData = await Blogpost.findAll({
@@ -113,7 +113,7 @@ router.get('/profile', withAuth, async (req, res) => {
       },
       include: [
         {
-          model: Blogposts,
+          model: Blogpost,
           attributes: ['title'],
         }
       ]
@@ -139,13 +139,13 @@ router.get('/profile', withAuth, async (req, res) => {
 router.get('/blogpost/:id', withAuth, async (req, res) => {
 
   try {
-    const blogData = await Blogpost.findOne({
+    const blogpostData = await Blogpost.findOne({
       where: {
         id: req.params.id
       }
     });
 
-    const blog = blogData.toJSON();
+    const blog = blogpostData.toJSON();
     console.log(blog);
 
 
