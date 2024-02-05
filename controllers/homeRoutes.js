@@ -4,7 +4,7 @@ const withAuth = require('../utils/auth');
 
 
 // Get route for homepage - getting all blogposts in the database
-router.get('/', withAuth async (req, res) => {
+router.get('/', withAuth, async (req, res) => {
   try {
 
     const blogData = await Blogpost.findAll({

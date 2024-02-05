@@ -9,7 +9,7 @@ router.post('/blogpost', async (req, res) => {
         const newPost = await Blogpost.create({
             title: req.body.title,
             description: req.body.description,
-            author_id: req.session.user_id,
+            user_id: req.session.user_id,
         });
 
         res.json({

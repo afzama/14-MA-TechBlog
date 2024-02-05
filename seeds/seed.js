@@ -1,33 +1,60 @@
 const sequelize = require('../config/connection');
 const { User, Blogpost, Comments } = require('../models');
 
-const userData = require('./user-seeds');
-const blogpostData = require('./blogpost-seeds');
-const commentData = require('./comment-seeds'); // Corrected import
+const { seedUsers } = require('./user-seeds');
+const { seedBlogpost } = require('./blogpost-seeds');
+const seedComments = require('./comment-seeds');
 
 const seedDatabase = async () => {
   await sequelize.sync({ force: true });
 
-  const users = await User.bulkCreate(userData, {
-    individualHooks: true,
-    returning: true,
-  });
+  // Function to seed existing users
+  const seedExistingUsers = async () => {
+    await seedUsers();
+  };
+  // Seed existing users
+  await seedExistingUsers();
+  // console.log('Users:', users);
 
-  for (const user of users) {
-    await Blogpost.create({
-      ...blogpostData[Math.floor(Math.random() * blogpostData.length)],
-      user_id: user.id,
-    });
+  //Seed blog posts
+  const blogpostData = await seedBlogpost();
+  const users = await User.findAll();
+  if (users && users.length > 0) {
+    for (const user of users) {
+      await Blogpost.create({
+        ...blogpostData[Math.floor(Math.random() * blogpostData.length)],
+        user_id: user.id,
+      });
+
+      // You can also create additional new blog posts here if needed
+      await Blogpost.create({
+        title: "New Blog Post Title",
+        description: "New Blog Post Description",
+        date_created: new Date(),
+        user_id: user.id,
+      });
+    }
   }
 
-  for (const blogpost of blogposts) {
+  for (const blogpost of blogpostData) {
     await Comments.create({
-      ...commentData[Math.floor(Math.random() * commentData.length)],
+      ...seedComments[Math.floor(Math.random() * seedComments.length)],
       user_id: users[Math.floor(Math.random() * users.length)].id,
       blogpost_id: blogpost.id,
     });
   }
 
+
+  const randomUser = users[Math.floor(Math.random() * users.length)];
+  if (randomUser) {
+    await Comments.create({
+      ...seedComments[Math.floor(Math.random() * seedComments.length)],
+      user_id: randomUser.id,
+      blogpost_id: Blogpost.id,
+    });
+  } else {
+    console.error('No users found.');
+  }
   process.exit(0);
 };
 
