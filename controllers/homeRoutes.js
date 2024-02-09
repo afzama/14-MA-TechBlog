@@ -1,158 +1,102 @@
 const router = require('express').Router();
-const { User, Blogpost, Comment } = require('../models');
-const withAuth = require('../utils/auth');
+const sequelize = require('../config/connection');
+const { Blogpost, User, Comment } = require('../models');
 
-
-// Get route for homepage - getting all blogposts in the database
-router.get('/', withAuth, async (req, res) => {
-  try {
-
-    const blogData = await Blogpost.findAll({
-      include: [
-        {
-
+router.get('/', (req, res) => {
+  Blogpost.findAll({
+    attributes: [
+      'id',
+      'title',
+      "post_text",
+      'created_at'      
+    ],
+    include: [
+      {
+        model: Comment,
+        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        include: {
           model: User,
-          attributes: ['name'],
-        },
-        {
-          model: Comment,
-          include: [
-            {
-              model: User,
-              attributes: ['name']
-            }
-          ]
-        }]
-    });
-    console.log("-----------------blog data")
-    console.log(blogData);
-
-    // Map the data in order to get a new array with only the needed info - i.e. - only the information that is posted in the database and eliminating any of the promise data
-
-    const blogArr = blogData.map((blogData) => blogData.get({ plain: true }));
-    console.log("-----------------blog array")
-    console.log(blogArr);
-
-    // Sending the data to the homepage
-    res.render('homepage', { blogArr });
-
-    // Catch error
-  } catch (err) {
-    res.status(500).json(err);
-  }
-
-});
-
-// get blog by single id
-router.get('/homepage/:id', async (req, res) => {
-  console.log("fix homepage for only post:", req.params.id);
-
-  try {
-    const blogData = await Blogpost.findOne({
-      where: { id: req.params.id },
-      include: [
-        {
-          model: User,
-          attributes: ['name'],
-        },
-        {
-          model: Comment,
-          include: [
-            {
-              model: User,
-              attributes: ['name']
-            }
-          ]
+          attributes: ['username']
         }
-      ]
-    });
-    console.log(blogData);
-
-    const blogJson = blogData.toJSON();
-    console.log("-----------------blog json")
-    console.log(blogJson);
-    res.render('singlePostHomepage', blogJson)
-
-  } catch (err) {
-    console.log(err)
-    res.status(500).json(err)
-  }
-
-});
-
-// Get route for login screen
-router.get('/login', async (req, res) => {
-  res.render('login');
-})
-
-// Get route for sign-up screen 
-router.get('/signup', async (req, res) => {
-  res.render('signup');
-});
-
-// Get route for profile by the user ID from the session.user.id
-router.get('/profile', withAuth, async (req, res) => {
-  console.log("GET request for the dashboard page by author_id!");
-
-  try {
-    //  we are creating a new variable to take all of the raw data from our User table where the id is equal to the session.user.id
-    const userData = await Blogpost.findAll({
-      where: {
-        author_id: req.session.user_id
       },
-      include: [
-        {
-          model: User,
-          attributes: ['name'],
-        },
-      ]
-    });
-    const commentData = await Comment.findAll({
-      where: {
-        author_id: req.session.user_id
-      },
-      include: [
-        {
-          model: Blogpost,
-          attributes: ['title'],
-        }
-      ]
-    });
-
-    // Converting the userData into an object we can pass into our handlebars template
-    const userArray = userData.map(userData => userData.toJSON());
-    const commentArray = commentData.map(commentData => commentData.toJSON());
-    console.log("USER DATA -----------")
-    console.log(userArray);
-    console.log("COMMENT DATA -----------")
-    console.log(commentArray)
-
-    // render the profile for the user with the new array from the map function
-    res.render('profile', { userArray });
-
-  } catch (err) {
-    console.log(err)
-    res.status(500).json(err)
-  }
-});
-
-router.get('/blogpost/:id', withAuth, async (req, res) => {
-
-  try {
-    const blogpostData = await Blogpost.findOne({
-      where: {
-        id: req.params.id
+      {
+        model: User,
+        attributes: ['username']
       }
+    ]
+  })
+    .then(dbblogpostData => {
+      const blogposts = dbblogpostData.map(blogpost => blogpost.get({ plain: true }));
+      // pass a single blogpost object into the homepage template
+      res.render('homepage', { 
+        blogposts,
+        loggedIn: req.session.loggedIn 
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
     });
+});
 
-    const blog = blogpostData.toJSON();
-    console.log(blog);
-
-
-  } catch (err) {
-    res.status(500).json(err)
+router.get('/login', (req, res) => {
+  if (req.session.loggedIn) {
+    res.redirect('/');
+    return;
   }
+  res.render('login');
+});
 
-})
+router.get('/blogpost/:id', (req, res) => {
+  Blogpost.findOne({
+    where: {
+      id: req.params.id
+    },
+    attributes: [
+      'id',
+      'title',
+      'blogpost_text',
+      'created_at'
+    ],
+    include: [
+      {
+        model: Comment,
+        attributes: [
+          'id',
+          'comment_text',
+          'blogpost_id',
+          'user_id',
+          'created_at'
+        ],
+        include: {
+          model: User,
+          attributes: ['username']
+        }
+      },
+      {
+        model: User,
+        attributes: ['username']
+      }
+    ]
+  })
+  .then(dbblogpostData => {
+    if (!dbblogpostData) {
+      res.status(404).json({ message: 'No Blogpost found with this id' });
+      return;
+    }
+    //serialize the data
+    const blogpost = dbblogpostData.get({ plain: true });
+
+    //pass data to the template
+    res.render('single-blogpost', {
+      blogpost, 
+      loggedIn: req.session.loggedIn
+    });
+  })
+  .catch(err => {
+    console.log(err);
+    res.status(500).json(err);
+  });
+});
 
 module.exports = router;

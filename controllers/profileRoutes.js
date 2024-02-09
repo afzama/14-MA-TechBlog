@@ -2,50 +2,84 @@ const router = require('express').Router();
 const { User, Blogpost, Comment } = require('../models');
 const withAuth = require('../utils/auth');
 
-// Request to GET all blogs by the user
-router.get('/:id', withAuth, async (req, res) => {
-    console.log("GET request for the profile page by author_id!");
-
-    try {
-        const userData = await User.findByPk(req.session.user_id, {
-            include: [
-                {
-                  model: Blogpost,
-                  attributes: ['title', 'description'],
-                },
-            ],
-        });
-
-        const user = userData.get({ plain: true });
-        console.log(user);
-        console.log("hello?");
-
-        res.render('user profile', { user });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
-    }
+// get all Blogposts
+router.get('/', withAuth, (req, res) => {
+  Blogpost.findAll({
+    where: {
+      user_id: req.session.user_id
+    },
+    attributes: ['id', 'title', 'post_text', 'created_at'],
+    order: [['created_at', 'DESC']],
+    include: [
+      {
+        model: User,
+        attributes: ['username']
+      },
+      {
+        model: Comment,
+        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        include: {
+          model: User,
+          attributes: ['username']
+        }
+      }
+    ]
+  })
+  .then(dbBlogpostData => {
+    //serialize the data before passing to the template
+    const Blogposts = dbBlogpostData.map(Blogpost => Blogpost.get({ plain: true }));
+    res.render('dashboard', { Blogposts, loggedIn: true });
+  })
+  .catch(err => {
+    console.log(err);
+    res.status(500).json(err);
+  });
 });
 
-// New blogpost POST Route
-router.post('/:id', withAuth, async (req, res) => {
-    console.log("POST route to create a new blog was hit!");
-
-    try {
-        const newPost = await Blogpost.create({
-            title: req.body.title,
-            description: req.body.description,
-            // Add any other necessary fields
-            user_id: req.session.user_id, // Associate the post with the logged-in user
-        });
-
-        res.status(200).json("A new post should be added!");
-        // res.status(200).json(newPost);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
-    }
+//get a single Blogpost
+router.get('/edit/:id', withAuth, (req, res) => {
+  Blogpost.findOne({
+    where: {
+      id: req.params.id
+    },
+    attributes: ['id', 'title', 'Blogpost_text', 'created_at'],
+    include: [
+      {
+        model: User,
+        attributes: ['username']
+      },
+      {
+        model: Comment,
+        attributes: ['id', 'comment_text', 'Blogpost_id', 'user_id', 'created_at'],
+        include: {
+          model: User,
+          attributes: ['username']
+        }
+      }
+    ]
+  })
+    .then(dbBlogpostData => {
+      if (!dbBlogpostData) {
+        res.status(404).json({ message: 'No Blogpost found with this id' });
+        return;
+      }
+      //serialize the data
+      const Blogpost = dbBlogpostData.get({ plain: true });
+      // pass to the template
+      res.render('edit-Blogpost', {
+        Blogpost,
+        loggedIn: req.session.loggedIn
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
+
+router.get('/new', (req, res) => {
+  res.render('new-Blogpost');
+});
+
 
 module.exports = router;

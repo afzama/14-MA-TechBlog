@@ -3,12 +3,12 @@ const newFormHandler = async (event) => {
   
     try {
       const blogTitle = document.querySelector('#blog-title').value.trim();
-      const blogDesc = document.querySelector('#blog-desc').value.trim();
+      const blogContent = document.querySelector('#blog-desc').value.trim();
   
-      if (blogTitle && blogDesc) {
+      if (blogTitle && blogContent) {
         const response = await fetch(`/api/user/blog`, {
           method: 'POST',
-          body: JSON.stringify({ blogTitle, blogDesc }),
+          body: JSON.stringify({ blogTitle, blogContent }),
           headers: {
             'Content-Type': 'application/json',
           },
@@ -54,12 +54,12 @@ const newFormHandler = async (event) => {
     try {
         const id = document.querySelector('#edit-post-id').value;
         const updatedTitle = document.querySelector('#edit-blog-title').value.trim();
-        const updatedDesc = document.querySelector('#edit-blog-desc').value.trim();
+        const updatedContent = document.querySelector('#edit-blog-Content').value.trim();
 
-        if (updatedTitle && updatedDesc) {
+        if (updatedTitle && updatedContent) {
             const response = await fetch(`/api/user/blog/${id}`, {
                 method: 'PUT',
-                body: JSON.stringify({ title: updatedTitle, description: updatedDesc }),
+                body: JSON.stringify({ title: updatedTitle, blogContent: updatedContent }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
