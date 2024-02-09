@@ -18,6 +18,7 @@ const seedDatabase = async () => {
 
   //Seed blog posts
   const blogpostData = await seedBlogpost();
+  await seedComments();
   const users = await User.findAll();
   if (users && users.length > 0) {
     for (const user of users) {
@@ -27,12 +28,12 @@ const seedDatabase = async () => {
       });
 
       // You can also create additional new blog posts here if needed
-      await Blogpost.create({
-        title: "New Blog Post Title",
-        description: "New Blog Post Description",
-        date_created: new Date(),
-        user_id: user.id,
-      });
+      // await Blogpost.create({
+      //   title: "New Blog Post Title",
+      //   description: "New Blog Post Description",
+      //   date_created: new Date(),
+      //   user_id: user.id,
+      // });
     }
   }
 
