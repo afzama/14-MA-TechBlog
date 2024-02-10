@@ -3,6 +3,42 @@ const bcrypt = require('bcrypt');
 const { User } = require('../../models');
 const withAuth = require('../../utils/auth');
 
+// Test login route with seeded user data
+router.post('/test-login', async (req, res) => {
+    try {
+        const testUser = await User.findOne({
+            where: {
+                email: 'hansensalon@gmail.com' // Use the email of one of your seeded users
+            }
+        });
+
+        if (!testUser) {
+            return res.status(404).json("User not found");
+        }
+
+        const match = await bcrypt.compare('expertnails1234!', testUser.password); // Use the password of the corresponding user
+
+        if (match) {
+            req.session.save(() => {
+                req.session.user_id = testUser.id;
+                req.session.name = testUser.name;
+                req.session.logged_in = true;
+
+                res.json({
+                    success: true,
+                    user: testUser,
+                    message: 'You are now logged in!'
+                });
+            });
+        } else {
+            res.status(400).json("Password incorrect");
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+
 //User login route
 router.post('/login', async (req, res) => {
     console.log("POST request hit!")
@@ -41,7 +77,7 @@ router.post('/login', async (req, res) => {
                 return res.status(400).json("Password was incorrect!")
             }
         } else {
-            return res.status(400), json("That user does not exist in our DB - please create an account to access these features.")
+            return res.status(400).json("That user does not exist in our DB - please create an account to access these features.")
         }
     } catch (err) {
         res.status(500).json(err)

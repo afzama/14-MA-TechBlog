@@ -8,7 +8,7 @@ router.post('/blogpost', async (req, res) => {
     try {
         const newPost = await Blogpost.create({
             title: req.body.title,
-            description: req.body.description,
+            content: req.body.content,
             user_id: req.session.user_id,
         });
 
@@ -35,7 +35,7 @@ router.get('/blogpost/:id', withAuth, async (req, res) => {
         const blogObj = {
             id: blogData.id,
             title: blogData.title,
-            description: blogData.description,
+            content: blogData.content,
         };
 
         res.json({ success: true, data: blogObj });

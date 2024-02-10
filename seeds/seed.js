@@ -3,7 +3,7 @@ const { User, Blogpost, Comment } = require('../models');
 
 const { seedUsers } = require('./user-seeds');
 const { seedBlogpost } = require('./blogpost-seeds');
-const seedComments = require('./comment-seeds');
+const { seedComments } = require('./comment-seeds');
 
 const seedDatabase = async () => {
   await sequelize.sync({ force: true });
@@ -26,12 +26,12 @@ const seedDatabase = async () => {
     });
 
     // Create comments for each blog post
-    const randomCommentsIndex = Math.floor(Math.random() * seedCommentsResult.length);
-    const randomComments = seedCommentsResult[randomCommentsIndex];
+    const randomComments = seedCommentsResult[Math.floor(Math.random() * seedCommentsResult.length)];
     await Comment.create({
       ...randomComments,
       user_id: user.id,
-      blogpost_id: randomBlogpost.id,
+      description: 'description',
+      date_created: new Date(),
     });
   }
 
@@ -44,7 +44,8 @@ const seedDatabase = async () => {
     await Comment.create({
       ...randomComment,
       user_id: randomUser.id,
-      blogpost_id: randomBlogpost.id,
+      description: 'description',
+      date_created: new Date(),
     });
   } else {
     console.error('No users or blog posts found.');

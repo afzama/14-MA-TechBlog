@@ -34,7 +34,7 @@ Comment.init(
             }
         },
 
-        // blogpost id
+        // blogpost id FK
         blogpost_id: {
             type: DataTypes.INTEGER,
             references: {
