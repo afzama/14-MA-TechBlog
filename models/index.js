@@ -1,6 +1,6 @@
 const User = require('./User');
 const Blogpost = require('./Blogpost');
-const Comments = require('./Comments');
+const Comment = require('./Comment');
 
 // User can have many blogposts
 User.hasMany(Blogpost, {
@@ -13,23 +13,23 @@ Blogpost.belongsTo(User, {
 });
 
 //User can have many comments
-User.hasMany(Comments, {
+User.hasMany(Comment, {
     foreignKey: 'user_id'
 })
 
 //Comments can only belong to 1 user
-Comments.belongsTo(User, {
+Comment.belongsTo(User, {
     foreignKey: 'user_id'
 });
 
 //Blogpost can have many comments
-Blogpost.hasMany(Comments, {
+Blogpost.hasMany(Comment, {
     foreignKey: 'comments_id'
 });
 
 //Comment can only belong to a blogpost
-Comments.belongsTo(Blogpost, {
+Comment.belongsTo(Blogpost, {
     foreignKey: 'comments_id'
 });
 
-module.exports = { User, Blogpost, Comments };
+module.exports = { User, Blogpost, Comment };

@@ -1,5 +1,5 @@
 // Wrapped in a function to be called after the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function () {
+function setupEventListeners() {
 
   const loginFormHandler = async (event) => {
     event.preventDefault();
@@ -57,4 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (signupForm) {
     signupForm.addEventListener('submit', signupFormHandler);
   }
-});
+};
+
+document.addEventListener('DOMContentLoaded', setupEventListeners);

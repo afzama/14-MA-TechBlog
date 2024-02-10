@@ -1,30 +1,40 @@
-const { Comments } = require('../models');
+const { Comment } = require('../models');
 
-const commentData = [
+const commentsData = [
     {
         user_id: 1,
-        blogpost_id: 5,
-        comment_description: "I want this at my next appointment!"
+        id: 5,
+        description: "I want this at my next appointment!",
+        date_created: '2024-02-09 08:16:24',
     },
     {
         user_id: 2,
-        blogpost_id: 4,
-        comment_description: "Sounds an interesting cinematic experience!"
+        id: 4,
+        description: "Sounds an interesting cinematic experience!",
+        date_created: '2024-01-28 04:03:44',
     },
     {
         user_id: 3,
-        blogpost_id: 2,
-        comment_description: "Amazing! Sign me up."
+        id: 2,
+        description: "Amazing! Sign me up.",
+        date_created: '2024-01-19 12:23:56',
     },
     {
         user_id: 4,
-        blogpost_id: 3,
-        comment_description: "Sounds exciting, I want to be part of this!"
+        id: 3,
+        description: "Sounds exciting, I want to be part of this!",
+        date_created: '2024-01-02 18:48:36',
     }
 ]
 
 const seedComments = async () => {
-    await Comments.bulkCreate(commentData);
+    await Comment.bulkCreate(commentsData)
+        .then(() => {
+            console.log('Comments inserted successfully.');
+        })
+        .catch((error) => {
+            console.error('Error inserting comments:', error);
+        });
 };
 
 module.exports = seedComments;

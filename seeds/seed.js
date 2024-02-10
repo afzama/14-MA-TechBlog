@@ -1,5 +1,5 @@
 const sequelize = require('../config/connection');
-const { User, Blogpost, Comments } = require('../models');
+const { User, Blogpost, Comment } = require('../models');
 
 const { seedUsers } = require('./user-seeds');
 const { seedBlogpost } = require('./blogpost-seeds');
@@ -8,54 +8,48 @@ const seedComments = require('./comment-seeds');
 const seedDatabase = async () => {
   await sequelize.sync({ force: true });
 
-  // Function to seed existing users
-  const seedExistingUsers = async () => {
-    await seedUsers();
-  };
   // Seed existing users
-  await seedExistingUsers();
-  // console.log('Users:', users);
+  await seedUsers();
 
-  //Seed blog posts
+  // Seed blog posts
   const blogpostData = await seedBlogpost();
-  await seedComments();
+  const seedCommentsResult = await seedComments();
   const users = await User.findAll();
-  if (users && users.length > 0) {
-    for (const user of users) {
-      await Blogpost.create({
-        ...blogpostData[Math.floor(Math.random() * blogpostData.length)],
-        user_id: user.id,
-      });
 
-      // You can also create additional new blog posts here if needed
-      // await Blogpost.create({
-      //   title: "New Blog Post Title",
-      //   description: "New Blog Post Description",
-      //   date_created: new Date(),
-      //   user_id: user.id,
-      // });
-    }
-  }
+  for (const user of users) {
+    const randomBlogpost = blogpostData[Math.floor(Math.random() * blogpostData.length)];
+    await Blogpost.create({
+      ...randomBlogpost,
+      user_id: user.id,
+      title: 'title',
+      content: 'content',
+    });
 
-  for (const blogpost of blogpostData) {
-    await Comments.create({
-      ...seedComments[Math.floor(Math.random() * seedComments.length)],
-      user_id: users[Math.floor(Math.random() * users.length)].id,
-      blogpost_id: blogpost.id,
+    // Create comments for each blog post
+    const randomCommentsIndex = Math.floor(Math.random() * seedCommentsResult.length);
+    const randomComments = seedCommentsResult[randomCommentsIndex];
+    await Comment.create({
+      ...randomComments,
+      user_id: user.id,
+      blogpost_id: randomBlogpost.id,
     });
   }
 
-
+  // Create a random comment for a random user on a random blog post
   const randomUser = users[Math.floor(Math.random() * users.length)];
-  if (randomUser) {
-    await Comments.create({
-      ...seedComments[Math.floor(Math.random() * seedComments.length)],
+  const randomBlogpost = blogpostData[Math.floor(Math.random() * blogpostData.length)];
+  const randomComment = seedCommentsResult[Math.floor(Math.random() * seedCommentsResult.length)];
+
+  if (randomUser && randomBlogpost) {
+    await Comment.create({
+      ...randomComment,
       user_id: randomUser.id,
-      blogpost_id: Blogpost.id,
+      blogpost_id: randomBlogpost.id,
     });
   } else {
-    console.error('No users found.');
+    console.error('No users or blog posts found.');
   }
+
   process.exit(0);
 };
 
