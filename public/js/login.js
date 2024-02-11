@@ -9,20 +9,31 @@ function setupEventListeners() {
     const password = document.querySelector('#password-login').value.trim();
 
     if (email && password) {
-      // Send a POST request to the API endpoint
-      const response = await fetch('/api/user/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      try {
+        // Send a POST request to the API endpoint
+        const response = await fetch('/api/user/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+          headers: { 'Content-Type': 'application/json' },
+        });
 
-      if (!response.ok) {
-        const responseBody = await response.json(); // Parse the response body as JSON
-        console.error(responseBody); // Log the response body to the console
-        alert(response.statusText);
+        if (!response.ok) {
+          const responseBody = await response.json(); // Parse the response body as JSON
+          console.error(responseBody); // Log the response body to the console
+          alert(response.statusText);
+        } else {
+          // Redirect to the homepage if login is successful
+          window.location.href = '/';
+        }
+      } catch (error) {
+        console.error(error);
+        // Handle errors, e.g., show an error message to the user
+
+        // Attach the event listener to the login form
+        document.querySelector('#login-login').addEventListener('submit', loginFormHandler);
       }
     }
-  };
+  }
 
   const signupFormHandler = async (event) => {
     event.preventDefault();
