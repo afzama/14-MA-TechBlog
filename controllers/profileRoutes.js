@@ -13,11 +13,11 @@ router.get('/', withAuth, (req, res) => {
     include: [
       {
         model: User,
-        attributes: ['username']
+        attributes: ['name']
       },
       {
         model: Comment,
-        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        attributes: ['id', 'comment_text', 'blogpost_id', 'user_id', 'created_at'],
         include: {
           model: User,
           attributes: ['username']
@@ -25,15 +25,15 @@ router.get('/', withAuth, (req, res) => {
       }
     ]
   })
-  .then(dbBlogpostData => {
-    //serialize the data before passing to the template
-    const Blogposts = dbBlogpostData.map(Blogpost => Blogpost.get({ plain: true }));
-    res.render('dashboard', { Blogposts, loggedIn: true });
-  })
-  .catch(err => {
-    console.log(err);
-    res.status(500).json(err);
-  });
+    .then(dbBlogpostData => {
+      //serialize the data before passing to the template
+      const Blogposts = dbBlogpostData.map(Blogpost => Blogpost.get({ plain: true }));
+      res.render('profile', { Blogposts, loggedIn: true });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 //get a single Blogpost
@@ -42,18 +42,18 @@ router.get('/edit/:id', withAuth, (req, res) => {
     where: {
       id: req.params.id
     },
-    attributes: ['id', 'title', 'Blogpost_text', 'created_at'],
+    attributes: ['id', 'title', 'post_text', 'created_at'],
     include: [
       {
         model: User,
-        attributes: ['username']
+        attributes: ['name']
       },
       {
         model: Comment,
-        attributes: ['id', 'comment_text', 'Blogpost_id', 'user_id', 'created_at'],
+        attributes: ['id', 'comment_text', 'blogpost_id', 'user_id', 'created_at'],
         include: {
           model: User,
-          attributes: ['username']
+          attributes: ['name']
         }
       }
     ]

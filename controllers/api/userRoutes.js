@@ -5,29 +5,34 @@ const withAuth = require('../../utils/auth');
 
 
 //login
-router.post("/login", (req, res) => {
-    //1. find the user who is trying to login
-    User.findOne({
-        where: {
-            email: req.body.email
-        }
-    }).then(foundUser => {
-        console.log("Found User:", foundUser);
-        if (!foundUser) {
-            res.status(401).json({ msg: "Invalid username/password" })
-        } else {
-            if (!bcrypt.compareSync(req.body.password, foundUser.password)) {
-                res.status(401).json({ msg: "Invalid username/password" })
-            } else {
-                req.session.user = {
-                    id: foundUser.id,
-                    email: foundUser.email
-                }
-                res.json(foundUser)
+router.post("/login", async (req, res) => {
+    try {
+        //find the user who is trying to login
+        const foundUser = await User.findOne({
+            where: {
+                email: req.body.email
             }
+        });
+
+        console.log("foundUser", foundUser)
+        if (!foundUser || !bcrypt.compareSync(req.body.password, foundUser.password)) {
+            res.status(401).json({ msg: "Invalid username/password" });
+            return;
         }
-    })
-})
+        console.log(req.session.user)
+        req.session.user = {
+            id: foundUser.id,
+            email: foundUser.email
+        };
+
+        // Redirect to the homepage
+        res.redirect('/');
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 //User logout route
 router.post('/logout', (req, res) => {
