@@ -22,7 +22,7 @@ const seedDatabase = async () => {
       ...randomBlogpost,
       user_id: user.id,
       title: 'title',
-      content: 'content',
+      post_text: 'post_text',
     });
 
     // Create comments for each blog post
@@ -30,8 +30,8 @@ const seedDatabase = async () => {
     await Comment.create({
       ...randomComments,
       user_id: user.id,
-      description: 'description',
-      date_created: new Date(),
+      comment_text: 'comment_text',
+      created_at: new Date(),
     });
   }
 
@@ -44,8 +44,8 @@ const seedDatabase = async () => {
     await Comment.create({
       ...randomComment,
       user_id: randomUser.id,
-      description: 'description',
-      date_created: new Date(),
+      comment_text: 'comment_text',
+      created_at: new Date(),
     });
   } else {
     console.error('No users or blog posts found.');
