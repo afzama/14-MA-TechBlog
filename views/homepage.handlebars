@@ -1,9 +1,18 @@
 {{#each blogposts as |blogpost|}}
   {{> blogpost-info blogpost }}
-{{/each}}
-
+  {{#if blogpost.comments.length}}
+    <h3>Comments:</h3>
+    <ul>
+      {{#each blogpost.comments as |comment|}}
+        <li>{{comment.text}}</li>
+        <!-- Add other comment information as needed -->
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>No comments for this blogpost yet.</p>
+  {{/if}}
 {{else}}
-  <h6 class="pb-4 has-text-centered is-italic">there are currently no blogposts</h6>
+  <h6 class="pb-4 has-text-centered is-italic">There are currently no blogposts</h6>
 {{/each}}
 
 {{#if session.logged_in}}
@@ -15,7 +24,7 @@
   </div>
 {{else}}
   <div class="call-to-action">
-    <h3>Want to create your own blogpost, or view/add comments?</h3>  
+    <h3>Want to create your own blogpost, or view/add comments?</h3>
     <h3>Sign up or login below!</h3>
     <span for="img" aria-label="blog">👩🏻‍💻</span>
     <div class="login-buttons">

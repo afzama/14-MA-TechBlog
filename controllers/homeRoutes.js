@@ -7,30 +7,31 @@ router.get('/', (req, res) => {
     attributes: [
       'id',
       'title',
-      "post_text",
-      'created_at'      
+      'post_text',
+      'created_at',
+      'user_id',
     ],
     include: [
       {
         model: Comment,
-        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        attributes: ['id', 'comment_text', 'created_at', 'user_id', 'blogpost_id'],
         include: {
           model: User,
-          attributes: ['username']
+          attributes: ['name']
         }
       },
       {
         model: User,
-        attributes: ['username']
+        attributes: ['name']
       }
     ]
   })
     .then(dbblogpostData => {
       const blogposts = dbblogpostData.map(blogpost => blogpost.get({ plain: true }));
       // pass a single blogpost object into the homepage template
-      res.render('homepage', { 
+      res.render('homepage', {
         blogposts,
-        loggedIn: req.session.loggedIn 
+        loggedIn: req.session.loggedIn
       });
     })
     .catch(err => {
@@ -55,8 +56,9 @@ router.get('/blogpost/:id', (req, res) => {
     attributes: [
       'id',
       'title',
-      'blogpost_text',
-      'created_at'
+      'post_text',
+      'created_at',
+      'user_id',
     ],
     include: [
       {
@@ -64,39 +66,39 @@ router.get('/blogpost/:id', (req, res) => {
         attributes: [
           'id',
           'comment_text',
-          'blogpost_id',
+          'created_at',
           'user_id',
-          'created_at'
+          'blogpost_id',
         ],
         include: {
           model: User,
-          attributes: ['username']
+          attributes: ['name']
         }
       },
       {
         model: User,
-        attributes: ['username']
+        attributes: ['name']
       }
     ]
   })
-  .then(dbblogpostData => {
-    if (!dbblogpostData) {
-      res.status(404).json({ message: 'No Blogpost found with this id' });
-      return;
-    }
-    //serialize the data
-    const blogpost = dbblogpostData.get({ plain: true });
+    .then(dbblogpostData => {
+      if (!dbblogpostData) {
+        res.status(404).json({ message: 'No Blogpost found with this id' });
+        return;
+      }
+      //serialize the data
+      const blogpost = dbblogpostData.get({ plain: true });
 
-    //pass data to the template
-    res.render('single-blogpost', {
-      blogpost, 
-      loggedIn: req.session.loggedIn
+      //pass data to the template
+      res.render('single-blogpost', {
+        blogpost,
+        loggedIn: req.session.loggedIn
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
     });
-  })
-  .catch(err => {
-    console.log(err);
-    res.status(500).json(err);
-  });
 });
 
 module.exports = router;

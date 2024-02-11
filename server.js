@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3001;
 
 // Set up Handlebars.js engine with custom helpers
 const hbs = exphbs.create({ helpers });
+hbs.handlebars.registerPartial('blogpost-info', hbs.handlebars.compile('{{> blogpost-info}}'));
 
 const sess = {
     secret: 'Super secret secret',

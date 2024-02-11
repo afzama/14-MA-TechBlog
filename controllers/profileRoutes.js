@@ -8,8 +8,8 @@ router.get('/', withAuth, (req, res) => {
     where: {
       user_id: req.session.user_id
     },
-    attributes: ['id', 'title', 'post_text', 'created_at'],
-    order: [['created_at', 'DESC']],
+    attributes: ['id', 'title', 'post_text', 'created_at', 'user_id'],
+    order: [['created_at', 'post_text']],
     include: [
       {
         model: User,
@@ -17,10 +17,10 @@ router.get('/', withAuth, (req, res) => {
       },
       {
         model: Comment,
-        attributes: ['id', 'comment_text', 'blogpost_id', 'user_id', 'created_at'],
+        attributes: ['id', 'comment_text', 'created_at', 'user_id', 'blogpost_id'],
         include: {
           model: User,
-          attributes: ['username']
+          attributes: ['name']
         }
       }
     ]
@@ -42,7 +42,7 @@ router.get('/edit/:id', withAuth, (req, res) => {
     where: {
       id: req.params.id
     },
-    attributes: ['id', 'title', 'post_text', 'created_at'],
+    attributes: ['id', 'title', 'post_text', 'created_at', 'user_id'],
     include: [
       {
         model: User,
@@ -50,7 +50,7 @@ router.get('/edit/:id', withAuth, (req, res) => {
       },
       {
         model: Comment,
-        attributes: ['id', 'comment_text', 'blogpost_id', 'user_id', 'created_at'],
+        attributes: ['id', 'comment_text', 'created_at', 'user_id', 'blogpost_id'],
         include: {
           model: User,
           attributes: ['name']
