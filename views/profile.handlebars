@@ -10,12 +10,12 @@
 
     <form class="form new-blog-form">
       <div class="form-group">
-        <label for="blog-name">Blogpost name:</label>
-        <input class="form-input" type="text" id="blog-name" name="blog-name" />
+        <label for="blogpost-title">Blogpost name:</label>
+        <input class="form-input" type="text" id="blogpost-title" name="blogpost-title" />
       </div>
       <div class="form-group">
-        <label for="blog-post">New Blog Post:</label>
-        <textarea class="form-input" id="blog-post" name="blog-post"></textarea>
+        <label for="blogpost-post_text">New Blog Post:</label>
+        <textarea class="form-input" id="blogpost-post_text" name="blogpost-post_text"></textarea>
       </div>
       <div class="form-group">
         <button type="submit" class="btn btn-primary">Create</button>
@@ -23,17 +23,17 @@
     </form>
   </div>
 
-  {{#if blogger.length}}
+  {{#if blogpostData}}
   <div class="col-md-6 project-list">
-    <h3>Current Projects:</h3>
+    <h3>Current Blogposts:</h3>
 
-    {{#each blogger as |blog|}}
+    {{#each blogpostData as |Blogpost|}}
     <div class="row mb-2">
       <div class="col-md-8">
-        <h4><a href="/project/{{blog.id}}">{{blog.name}}</a></h4>
+        <h4><a href="/blogpost/{{blogpost.id}}">{{blogpost.title}}</a></h4>
       </div>
       <div class="col-md-4">
-        <button class="btn btn-sm btn-danger" data-id="{{blog.id}}">DELETE</button>
+        <button class="btn btn-sm btn-danger" data-id="{{blogpost.id}}">DELETE</button>
       </div>
     </div>
     {{/each}}
